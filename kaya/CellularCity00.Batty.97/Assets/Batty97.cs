@@ -21,14 +21,18 @@ public class Batty97 : MonoBehaviour {
 	// Use this for initialization
 	public float probability = 0.8f;
 	private int msize = 100;
+	private float[,] p;
+	private int gen; 
 
 	private int[,] map;
 	private GameObject[,] cubes;
 	void Start () {
 		map = new int[msize, msize];
 		cubes = new GameObject[msize, msize];
+		p = new float[msize, msize];
 		for (int i = 0; i < msize; i++) {
 			for (int j = 0; j < msize; j++) {
+				p [i, j] = 0.8f;
 				map [i, j] = 0;
 				GameObject k = GameObject.CreatePrimitive (PrimitiveType.Cube);
 				k.transform.localScale = new Vector3 (0.9f, 0.9f, 0.9f);
@@ -44,6 +48,7 @@ public class Batty97 : MonoBehaviour {
 		 */
 		map [msize / 2, msize / 2] = 1;
 		cubes [msize / 2, msize / 2].SetActive (true);
+		gen = 1;
 	}
 
 	string getName(int i, int j) { // looks like we wont need this. but let's keep it.
@@ -61,17 +66,19 @@ public class Batty97 : MonoBehaviour {
 			int[,] temp = new int[msize,msize];
 			for(int i=0;i<msize;i++) {
 				for(int j=0;j<msize;j++) {
-					/* for this particular node, calculate T */
-					if (getT (i, j) > 0 && Random.value < probability) {
-						/* if there is at least 1 developed node in the
-						 * neighbourhood (computed by getT) and if the
-						 * random value is less than probability 0.8
-						 * then set new state.
-						 */
-						temp [i, j] = 1;
-						cubes [i, j].SetActive (true);
+					if (temp [i, j] == 0) {
+						/* for this particular node, calculate T */
+						if (getT (i, j) > 0 && Random.value < Mathf.Pow(p[i,j], gen)) {
+							/* if there is at least 1 developed node in the
+						 	* neighbourhood (computed by getT) and if the
+						 	* random value is less than probability 0.8
+						 	* then set new state.
+						 	*/
+							temp [i, j] = 1;
+							cubes [i, j].SetActive (true);
+						}
+						else temp[i,j] = 0;
 					}
-					else temp[i,j] = 0;
 				}
 			}
 			// copy temp to map
@@ -80,6 +87,7 @@ public class Batty97 : MonoBehaviour {
 					map[i,j] = temp[i,j];
 				}
 			}
+			gen++;
 		}
 	}
 
